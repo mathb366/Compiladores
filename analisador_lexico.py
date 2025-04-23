@@ -3,8 +3,8 @@ import os
 
 class AnalisadorLexicoRegex:
     def __init__(self):
-        self.arquivo_e = "programa.txt"
-        self.arquivo_s = "resp-lex.txt"
+        self.arquivo_e = "entrada.txt"
+        self.arquivo_s = "saida.txt"
         self.tokens = [
             # Comentários
             ('COMENTARIO_LINHA', r'//.*'),
@@ -110,6 +110,5 @@ class AnalisadorLexicoRegex:
 
             saida.write('$')
 
-# Executa
 analisador = AnalisadorLexicoRegex()
 analisador.analisa()

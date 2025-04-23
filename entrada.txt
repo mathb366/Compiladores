@@ -1,0 +1,15 @@
+algoritmo Exemplo
+variaveis a, b inteiro;
+//.Comentario nao
+inicio
+   leia(a);
+   escreva("O valor de a: ", a);
+   se a > 10 entao
+      escreva("a é maior que 10");
+   senao
+      escreva("a é menor ou igual a 10");
+   fim_se
+fim_algoritmo
+/
+Teste
+/
