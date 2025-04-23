@@ -1,0 +1,37 @@
+tok600_algoritmo->1
+tok601_variaveis->2
+tok500_x->3
+tok115_=->3
+tok301_3.14->3
+tok200_;->3
+tok500_y->4
+tok115_=->4
+tok300_10->4
+tok200_;->4
+tok104_/->6
+tok103_*->6
+Erro Lexico - Caracter Invalido: c - linha: 7
+Erro Lexico - Caracter Invalido: o - linha: 7
+Erro Lexico - Caracter Invalido: m - linha: 7
+Erro Lexico - Caracter Invalido: e - linha: 7
+Erro Lexico - Caracter Invalido: n - linha: 7
+Erro Lexico - Caracter Invalido: t - linha: 7
+Erro Lexico - Caracter Invalido: á - linha: 7
+Erro Lexico - Caracter Invalido: r - linha: 7
+Erro Lexico - Caracter Invalido: i - linha: 7
+Erro Lexico - Caracter Invalido: o - linha: 7
+tok500_de->7
+tok500_bloco->7
+tok103_*->8
+tok104_/->8
+tok607_se->9
+tok500_x->9
+tok110_>=->9
+tok500_y->9
+tok204_{->9
+tok6012_escreva->10
+tok202_(->10
+tok700_"x é maior ou igual"->10
+tok203_)->10
+tok205_}->11
+$

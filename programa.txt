@@ -1,0 +1,11 @@
+algoritmo
+variaveis
+x = 3.14;
+y = 10;
+// isso é um comentário
+/*
+comentário de bloco
+*/
+se x >= y {
+    escreva("x é maior ou igual")
+}
