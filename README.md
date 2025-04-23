@@ -1,12 +1,12 @@
 # Compiladores
 
 ## Especificações do Código
-1. Leitura de Arquivo:
+**1. Leitura de Arquivo:**
 
 Lê o conteúdo de um arquivo chamado programa.txt.
 Os resultados da análise são gravados em resp-lex.txt.
 
-2. Definição de Tokens:
+**2. Definição de Tokens:**
 
 Os tokens são definidos com base em expressões regulares, categorizados como:
 - Comentários (//, /* */)
@@ -29,7 +29,7 @@ Os tokens são definidos com base em expressões regulares, categorizados como:
 
 - Caracteres inválidos
 
-3. Tratamento de Erros:
+**3. Tratamento de Erros:**
 
 Detecta e reporta:
 
