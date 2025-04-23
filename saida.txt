@@ -1,0 +1,42 @@
+tok600_algoritmo->1
+tok500_Exemplo->1
+tok601_variaveis->2
+tok500_a->2
+tok201_,->2
+tok500_b->2
+tok6013_inteiro->2
+tok500_inicio->3
+tok6011_leia->4
+tok202_(->4
+tok500_a->4
+tok203_)->4
+tok200_;->4
+tok6012_escreva->5
+tok202_(->5
+tok700_"O valor de a: "->5
+tok201_,->5
+tok500_a->5
+tok203_)->5
+tok607_se->6
+tok500_a->6
+tok109_>->6
+tok300_10->6
+tok500_entao->6
+Erro Lexico - Caracter Invalido: : - linha: 6
+tok6012_escreva->7
+tok202_(->7
+tok700_"a é maior que 10"->7
+tok203_)->7
+tok608_senao->8
+tok6012_escreva->9
+tok202_(->9
+tok700_"a é menor ou igual a 10"->9
+tok203_)->9
+tok500_fim_se->10
+tok500_fim_algoritmo->11
+tok104_/->12
+tok103_*->12
+tok500_Teste->13
+tok103_*->14
+tok104_/->14
+$
