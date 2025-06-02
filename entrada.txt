@@ -1,4 +1,10 @@
-algoritmo exemplo {
-    escreva("Hello");
+algoritmo teste {
     leia(x);
-}mad
+    se (x > 0){
+        escreva("Valor positivo");
+    }
+
+    para (i = 0; i < 10; i++)
+        escreva("Contando...");
+    }
+}

@@ -35,7 +35,7 @@ class AnalisadorSintatico:
             self.index += 1
             return True
         else:
-            self.erros.append(f"Erro sintático na linha {linha}: esperado {esperado_prefixo}, encontrado {atual}")
+            self.erros.append(f"Erro sintático na linha {linha}: encontrado {atual}")
             return False
 
     def start(self):
@@ -109,7 +109,6 @@ class AnalisadorSintatico:
         self.consumir("tok205_")  # }
 
     def expressao(self):
-        # Reconhece uma sequência do tipo: [id|literal] ([op] [id|literal])*
         operadores = (
             "tok100_", "tok101_", "tok102_", "tok103_", "tok104_",  # . + - * /
             "tok105_", "tok106_", "tok107_", "tok108_", "tok109_",  # ++ -- == != >
@@ -117,22 +116,27 @@ class AnalisadorSintatico:
             "tok115_"  # =
         )
         operandos = ("tok500_", "tok300_", "tok301_")  # id, int, real
-        especiais = ("tok202_", "tok203_")
-
         expr_ok = False
+
         while self.index < len(self.tokens):
             token, linha = self.token_atual()
 
-            if token.startswith(operandos) or token.startswith(especiais):
+            if token.startswith(operandos):
                 expr_ok = True
                 self.index += 1
             elif any(token.startswith(op) for op in operadores):
                 self.index += 1
+            elif token.startswith("tok203_") or token.startswith("tok200_") or token.startswith("tok204_"):
+                # fim da expressão esperada
+                break
             else:
+                self.erros.append(f"Expressão mal formada na linha {linha}")
                 break
 
         if not expr_ok:
+            _, linha = self.token_atual()
             self.erros.append(f"Expressão mal formada na linha {linha}")
+
 
     def reportar(self):
         if not self.erros:
