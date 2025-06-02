@@ -1,3 +1,4 @@
+
 import re
 import os
 
@@ -30,10 +31,10 @@ class AnalisadorLexicoRegex:
             ('tok400', r"'[^']'"),
 
             # Cadeia constante
-            ('tok700', r'"[^"\n]*"'),
+            ('tok700', r'\"[^"\n]*\"'),
 
             # Palavras reservadas
-            *[(f'tok60{i}', r'\b' + palavra + r'\b') for i, palavra in enumerate([
+            *[(f'tok{600 + i}', r'\b' + palavra + r'\b') for i, palavra in enumerate([
                 'algoritmo', 'variaveis', 'constantes', 'registro', 'funcao',
                 'retorno', 'vazio', 'se', 'senao', 'enquanto', 'para', 'leia',
                 'escreva', 'inteiro', 'real', 'booleano', 'char', 'cadeia', 
@@ -51,7 +52,6 @@ class AnalisadorLexicoRegex:
             ('INVALIDO', r'.'),
         ]
 
-        # Compila todos os padrões numa única expressão
         self.regex = re.compile('|'.join(f'(?P<{nome}>{padrao})' for nome, padrao in self.tokens))
 
     def mudaEntrada(self, arquivo):
@@ -69,8 +69,7 @@ class AnalisadorLexicoRegex:
                 out.write("Arquivo de entrada inexistente")
             return
 
-        with open(self.arquivo_e, 'r', encoding='utf-8') as entrada, \
-             open(self.arquivo_s, 'w', encoding='utf-8') as saida:
+        with open(self.arquivo_e, 'r', encoding='utf-8') as entrada,              open(self.arquivo_s, 'w', encoding='utf-8') as saida:
 
             numero_linha = 1
             bloco_aberto = False
@@ -84,21 +83,21 @@ class AnalisadorLexicoRegex:
 
                     tipo = match.lastgroup
                     lexema = match.group(tipo)
+                    coluna = pos + 1
 
-                    # Ignora espaços e novas linhas
                     if tipo == 'WHITESPACE' or tipo == 'NEWLINE':
                         pass
                     elif tipo == 'COMENTARIO_LINHA':
                         break
                     elif tipo == 'COMENTARIO_BLOCO':
                         if '*/' not in lexema:
-                            saida.write(f"Erro Lexico - Comentario de bloco nao fechado - linha: {numero_linha}\n")
+                            saida.write(f"Erro Lexico - Comentario de bloco nao fechado - linha: {numero_linha}, coluna: {coluna}\n")
                             bloco_aberto = True
                             break
                     elif tipo == 'INVALIDO':
-                        saida.write(f"Erro Lexico - Caracter Invalido: {lexema} - linha: {numero_linha}\n")
+                        saida.write(f"Erro Lexico - Caracter Invalido: {lexema} - linha: {numero_linha}, coluna: {coluna}\n")
                     elif tipo == 'tok400' and lexema == "''":
-                        saida.write(f"Erro Lexico - Caractere nao pode ser vazio - Linha: {numero_linha}\n")
+                        saida.write(f"Erro Lexico - Caractere nao pode ser vazio - linha: {numero_linha}, coluna: {coluna}\n")
                     else:
                         saida.write(f"{tipo}_{lexema}->"+str(numero_linha)+'\n')
 
@@ -110,5 +109,6 @@ class AnalisadorLexicoRegex:
 
             saida.write('$')
 
-analisador = AnalisadorLexicoRegex()
-analisador.analisa()
+if __name__ == "__main__":
+    analisador = AnalisadorLexicoRegex()
+    analisador.analisa()
