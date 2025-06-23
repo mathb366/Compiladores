@@ -151,3 +151,12 @@ class AnalisadorSintatico:
 if __name__ == "__main__":
     analisador = AnalisadorSintatico()
     analisador.start()
+
+def get_tabelas(self):
+        return {
+            "registro": self.registro_tab if hasattr(self, 'registro_tab') else {},
+            "constantes": self.constantes_tab if hasattr(self, 'constantes_tab') else {},
+            "variaveisGlobais": self.variaveis_globais_tab if hasattr(self, 'variaveis_globais_tab') else {},
+            "funcoes": self.funcoes_tab if hasattr(self, 'funcoes_tab') else {},
+            "algoritmo": self.algoritmo_tab if hasattr(self, 'algoritmo_tab') else {}
+        }
