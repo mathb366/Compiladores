@@ -1,7 +1,7 @@
 algoritmo exemplo {
     variaveis
         inteiro x;
-        real x;
+        real y;
     constantes
         inteiro a = 10;
         real b = 3.14;

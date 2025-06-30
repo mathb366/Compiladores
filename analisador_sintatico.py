@@ -83,9 +83,9 @@ class AnalisadorSintatico:
                         nome = token_nome.split("_", 1)[1]
                     else:
                         nome = token_nome
-                    if nome in self.variaveis_globais_tab:
-                        print(f"[Sintático] Variável '{nome}' já declarada anteriormente.")
-                    self.variaveis_globais_tab[nome] = (tipo, "variavel", "global")
+                    if nome not in self.variaveis_globais_tab:
+                        self.variaveis_globais_tab[nome] = []
+                    self.variaveis_globais_tab[nome].append((tipo, "variavel", "global"))
                     self.index += 1
                     self.consumir("tok200_")
                 else:

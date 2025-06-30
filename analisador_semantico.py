@@ -4,8 +4,8 @@ class AnalisadorSemantico:
     def __init__(self):
         self.tabela_semantica = {}
         self.tem_erro_semantico = False
-        self.arquivo_saida_path = "saida_semantica.txt"
-        self.arquivo_saida = open(self.arquivo_saida_path, 'w')
+        self.arquivo_saida_path = "saida.txt"
+        self.arquivo_saida = open(self.arquivo_saida_path, 'a', encoding='utf-8')  # Abrir em modo append
 
     def carregar_tabelas(self, tabelas):
         self.tabela_semantica = tabelas
@@ -16,6 +16,7 @@ class AnalisadorSemantico:
         self.algoritmo_tab = tabelas.get("algoritmo", {})
 
     def analisa(self):
+        self.arquivo_saida.write("\nExecutando analisador semântico com as tabelas...\n")
         self.verificar_duplicidade_globais()
         self.verificar_constantes_iniciais()
         self.verificar_registros()
@@ -40,8 +41,8 @@ class AnalisadorSemantico:
 
     def verificar_duplicidade_globais(self):
         nomes = {}
-        for nome in self.variaveis_globais_tab:
-            if nome in nomes:
+        for nome, entradas in self.variaveis_globais_tab.items():
+            if len(entradas) > 1:
                 self.erro(f"Variável global '{nome}' declarada mais de uma vez.")
             nomes[nome] = 'variavel'
 
@@ -72,13 +73,13 @@ class AnalisadorSemantico:
 
 # Execução
 if __name__ == "__main__":
-    print("Executando analisador sintático para obter tabelas...")
+    with open("saida.txt", "w", encoding='utf-8') as f:
+        f.write("Executando analisador sintático para obter tabelas...\n")
     sintatico = AnalisadorSintatico()
     sintatico.start()
 
     tabelas = sintatico.get_tabelas()
 
-    print("Executando analisador semântico com as tabelas...")
     semantico = AnalisadorSemantico()
     semantico.carregar_tabelas(tabelas)
     semantico.analisa()
