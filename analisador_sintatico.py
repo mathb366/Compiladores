@@ -5,7 +5,7 @@ class AnalisadorSintatico:
         self.tokens = []
         self.index = 0
         self.erros = []
-
+        self.variaveis_globais_tab = {}
         self.executar_lexico()
 
     def executar_lexico(self):
@@ -50,21 +50,95 @@ class AnalisadorSintatico:
         if not self.consumir("tok600_"): return  # algoritmo
         if not self.consumir("tok500_"): return  # identificador
         if not self.consumir("tok204_{"): return  # {
+
+        self.bloco_declaracoes()
         self.comandos()
+
         if not self.consumir("tok205_"): return  # }
+
+    def bloco_declaracoes(self):
+        while True:
+            token, _ = self.token_atual()
+            if token.startswith("tok601_"):  # variaveis
+                self.index += 1
+                self.parse_declaracoes_variaveis()
+            elif token.startswith("tok602_"):  # constantes
+                self.index += 1
+                self.parse_declaracoes_constantes()
+            elif token.startswith("tok603_") or token.startswith("tok604_"):  # registros ou registro
+                self.index += 1
+                self.parse_declaracoes_registros()
+            else:
+                break
+
+    def parse_declaracoes_variaveis(self):
+        while True:
+            token, _ = self.token_atual()
+            if token.startswith("tok613_") or token.startswith("tok614_") or token.startswith("tok615_") or token.startswith("tok616_") or token.startswith("tok617_"):
+                tipo = token.split("_")[1]  # Ex: inteiro
+                self.index += 1
+                if self.token_atual()[0].startswith("tok500_"):
+                    token_nome = self.token_atual()[0]
+                    if '_' in token_nome:
+                        nome = token_nome.split("_", 1)[1]
+                    else:
+                        nome = token_nome
+                    if nome in self.variaveis_globais_tab:
+                        print(f"[Sintático] Variável '{nome}' já declarada anteriormente.")
+                    self.variaveis_globais_tab[nome] = (tipo, "variavel", "global")
+                    self.index += 1
+                    self.consumir("tok200_")
+                else:
+                    break
+            else:
+                break
+
+    def parse_declaracoes_constantes(self):
+        while True:
+            token, _ = self.token_atual()
+            if token.startswith("tok613_") or token.startswith("tok614_") or token.startswith("tok615_") or token.startswith("tok616_") or token.startswith("tok617_"):
+                self.index += 1
+                if self.token_atual()[0].startswith("tok500_"):
+                    self.index += 1
+                    self.consumir("tok115_")
+                    self.index += 1  # valor
+                    self.consumir("tok200_")
+                else:
+                    break
+            else:
+                break
+
+    def parse_declaracoes_registros(self):
+        if self.token_atual()[0].startswith("tok604_"):  # registro
+            self.index += 1
+        if self.token_atual()[0].startswith("tok500_"):
+            self.index += 1
+            self.consumir("tok204_")
+            while True:
+                token, _ = self.token_atual()
+                if token.startswith("tok613_") or token.startswith("tok614_") or token.startswith("tok615_") or token.startswith("tok616_") or token.startswith("tok617_"):
+                    self.index += 1
+                    if self.token_atual()[0].startswith("tok500_"):
+                        self.index += 1
+                        self.consumir("tok200_")
+                    else:
+                        break
+                else:
+                    break
+            self.consumir("tok205_")
 
     def comandos(self):
         while self.index < len(self.tokens):
             token, _ = self.token_atual()
-            if token.startswith("tok612_"):       # escreva
+            if token.startswith("tok612_"):
                 self.cmd_escreva()
-            elif token.startswith("tok611_"):     # leia
+            elif token.startswith("tok611_"):
                 self.cmd_leia()
-            elif token.startswith("tok607_"):     # se
+            elif token.startswith("tok607_"):
                 self.cmd_se()
-            elif token.startswith("tok610_"):     # para
+            elif token.startswith("tok610_"):
                 self.cmd_para()
-            elif token.startswith("tok205_"):     # }
+            elif token.startswith("tok205_"):
                 break
             else:
                 self.erros.append(f"Comando desconhecido ou fora de contexto: {token}")
@@ -72,62 +146,60 @@ class AnalisadorSintatico:
 
     def cmd_escreva(self):
         self.consumir("tok612_")
-        self.consumir("tok202_")  # (
-        self.consumir("tok700_")  # cadeia
-        self.consumir("tok203_")  # )
-        self.consumir("tok200_")  # ;
+        self.consumir("tok202_")
+        self.consumir("tok700_")
+        self.consumir("tok203_")
+        self.consumir("tok200_")
 
     def cmd_leia(self):
         self.consumir("tok611_")
-        self.consumir("tok202_")  # (
-        self.consumir("tok500_")  # identificador
-        self.consumir("tok203_")  # )
-        self.consumir("tok200_")  # ;
+        self.consumir("tok202_")
+        self.consumir("tok500_")
+        self.consumir("tok203_")
+        self.consumir("tok200_")
 
     def cmd_se(self):
-        self.consumir("tok607_")  # se
-        self.consumir("tok202_")  # (
+        self.consumir("tok607_")
+        self.consumir("tok202_")
         self.expressao()
-        self.consumir("tok203_")  # )
-        self.consumir("tok204_")  # {
+        self.consumir("tok203_")
+        self.consumir("tok204_")
         self.comandos()
-        self.consumir("tok205_")  # }
+        self.consumir("tok205_")
 
     def cmd_para(self):
-        self.consumir("tok610_")  # para
-        self.consumir("tok202_")  # (
-        self.consumir("tok500_")  # id
-        self.consumir("tok115_")  # =
+        self.consumir("tok610_")
+        self.consumir("tok202_")
+        self.consumir("tok500_")
+        self.consumir("tok115_")
         self.expressao()
-        self.consumir("tok200_")  # ;
+        self.consumir("tok200_")
         self.expressao()
-        self.consumir("tok200_")  # ;
+        self.consumir("tok200_")
         self.expressao()
-        self.consumir("tok203_")  # )
-        self.consumir("tok204_")  # {
+        self.consumir("tok203_")
+        self.consumir("tok204_")
         self.comandos()
-        self.consumir("tok205_")  # }
+        self.consumir("tok205_")
 
     def expressao(self):
         operadores = (
-            "tok100_", "tok101_", "tok102_", "tok103_", "tok104_",  # . + - * /
-            "tok105_", "tok106_", "tok107_", "tok108_", "tok109_",  # ++ -- == != >
-            "tok110_", "tok111_", "tok112_", "tok113_", "tok114_",  # >= < <= && ||
-            "tok115_"  # =
+            "tok100_", "tok101_", "tok102_", "tok103_", "tok104_",
+            "tok105_", "tok106_", "tok107_", "tok108_", "tok109_",
+            "tok110_", "tok111_", "tok112_", "tok113_", "tok114_",
+            "tok115_"
         )
-        operandos = ("tok500_", "tok300_", "tok301_")  # id, int, real
+        operandos = ("tok500_", "tok300_", "tok301_")
         expr_ok = False
 
         while self.index < len(self.tokens):
             token, linha = self.token_atual()
-
             if token.startswith(operandos):
                 expr_ok = True
                 self.index += 1
             elif any(token.startswith(op) for op in operadores):
                 self.index += 1
             elif token.startswith("tok203_") or token.startswith("tok200_") or token.startswith("tok204_"):
-                # fim da expressão esperada
                 break
             else:
                 self.erros.append(f"Expressão mal formada na linha {linha}")
@@ -137,7 +209,6 @@ class AnalisadorSintatico:
             _, linha = self.token_atual()
             self.erros.append(f"Expressão mal formada na linha {linha}")
 
-
     def reportar(self):
         if not self.erros:
             print("Análise sintática concluída com sucesso.")
@@ -146,17 +217,15 @@ class AnalisadorSintatico:
             for erro in self.erros:
                 print(erro)
 
+    def get_tabelas(self):
+        return {
+            "registro": getattr(self, "registro_tab", {}),
+            "constantes": getattr(self, "constantes_tab", {}),
+            "variaveisGlobais": self.variaveis_globais_tab,
+            "funcoes": getattr(self, "funcoes_tab", {}),
+            "algoritmo": getattr(self, "algoritmo_tab", {})
+        }
 
-# Execução
 if __name__ == "__main__":
     analisador = AnalisadorSintatico()
     analisador.start()
-
-def get_tabelas(self):
-        return {
-            "registro": self.registro_tab if hasattr(self, 'registro_tab') else {},
-            "constantes": self.constantes_tab if hasattr(self, 'constantes_tab') else {},
-            "variaveisGlobais": self.variaveis_globais_tab if hasattr(self, 'variaveis_globais_tab') else {},
-            "funcoes": self.funcoes_tab if hasattr(self, 'funcoes_tab') else {},
-            "algoritmo": self.algoritmo_tab if hasattr(self, 'algoritmo_tab') else {}
-        }
