@@ -1,0 +1,11 @@
+LEIA x
+IF_FALSE x GOTO L1
+ESCREVA "Valor positivo"
+i = 0
+L2:
+IF_FALSE i GOTO L3
+ESCREVA "Contando..."
+i = ?
+GOTO L2
+L3:
+L1:
