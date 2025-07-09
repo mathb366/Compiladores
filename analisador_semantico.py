@@ -5,7 +5,7 @@ class AnalisadorSemantico:
         self.tabela_semantica = {}
         self.tem_erro_semantico = False
         self.arquivo_saida_path = "saida.txt"
-        self.arquivo_saida = open(self.arquivo_saida_path, 'a', encoding='utf-8')  # Abrir em modo append
+        self.arquivo_saida = open(self.arquivo_saida_path, 'a', encoding='utf-8')  # Modo append
 
     def carregar_tabelas(self, tabelas):
         self.tabela_semantica = tabelas
@@ -20,6 +20,7 @@ class AnalisadorSemantico:
         self.verificar_duplicidade_globais()
         self.verificar_constantes_iniciais()
         self.verificar_registros()
+        self.verificar_conflito_tipos()
 
         self.arquivo_saida.write("\n=== RESULTADO DA ANÁLISE SEMÂNTICA ===\n")
         if self.tem_erro_semantico:
@@ -51,6 +52,14 @@ class AnalisadorSemantico:
                 self.erro(f"Constante '{nome}' duplicada com variável global '{nome}'.")
             nomes[nome] = 'constante'
 
+        for func_nome, dados in self.funcoes_tab.items():
+            if "variaveis" in dados:
+                vistos = set()
+                for var_nome in dados["variaveis"]:
+                    if var_nome in vistos:
+                        self.erro(f"Variável local '{var_nome}' duplicada na função '{func_nome}'.")
+                    vistos.add(var_nome)
+
     def verificar_constantes_iniciais(self):
         for nome, dados in self.constantes_tab.items():
             tipo, categoria, escopo = dados
@@ -66,14 +75,29 @@ class AnalisadorSemantico:
                     self.erro(f"Campo '{campo}' duplicado no registro '{nome_registro}'.")
                 vistos.add(campo)
 
+    def verificar_conflito_tipos(self):
+        for func_nome, dados in self.funcoes_tab.items():
+            parametros = dados.get("parametros", {})
+            variaveis = dados.get("variaveis", {})
+            for nome_var, tipo_info in variaveis.items():
+                tipo_var, _, _ = tipo_info
+                if nome_var in parametros:
+                    tipo_param = parametros[nome_var][0]
+                    if tipo_param != tipo_var:
+                        self.erro(
+                            f"Conflito de tipos na função '{func_nome}': parâmetro '{nome_var}' é '{tipo_param}', "
+                            f"mas variável com mesmo nome é '{tipo_var}'."
+                        )
+
     def erro(self, msg):
         print(f"Erro semântico: {msg}")
         self.arquivo_saida.write(f"Erro semântico: {msg}\n")
         self.tem_erro_semantico = True
 
+
 # Execução
 if __name__ == "__main__":
-    with open("saida.txt", "w", encoding='utf-8') as f:
+    with open("saida.txt", "w", encoding="utf-8") as f:
         f.write("Executando analisador sintático para obter tabelas...\n")
     sintatico = AnalisadorSintatico()
     sintatico.start()

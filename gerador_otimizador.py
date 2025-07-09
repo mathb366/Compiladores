@@ -107,6 +107,7 @@ class GeradorCodigo:
             return valor
         return "?"
 
+
 class OtimizadorCodigo:
     def __init__(self, codigo_intermediario):
         self.codigo = codigo_intermediario
@@ -122,6 +123,51 @@ class OtimizadorCodigo:
                 vistos.add(var)
             otimizados.append(linha)
         return otimizados
+
+
+class GeradorMIPS:
+    def __init__(self, codigo_intermediario):
+        self.codigo = codigo_intermediario
+        self.saida = []
+
+    def traduzir(self):
+        for linha in self.codigo:
+            if linha.startswith("LEIA"):
+                var = linha.split()[1]
+                self.saida.append(f"# LEIA {var}")
+                self.saida.append("li $v0, 5")
+                self.saida.append("syscall")
+                self.saida.append(f"move ${var}, $v0")
+
+            elif linha.startswith("ESCREVA"):
+                val = linha.split()[1]
+                self.saida.append(f"# ESCREVA {val}")
+                self.saida.append(f"li $a0, {val}")
+                self.saida.append("li $v0, 1")
+                self.saida.append("syscall")
+
+            elif " = " in linha:
+                var, expr = linha.split(" = ")
+                if expr.isdigit():
+                    self.saida.append(f"li ${var}, {expr}")
+                else:
+                    self.saida.append(f"move ${var}, ${expr}")
+
+            elif "IF_FALSE" in linha:
+                partes = linha.split()
+                cond, label = partes[1], partes[3]
+                self.saida.append(f"# IF_FALSE {cond} GOTO {label}")
+                self.saida.append(f"beq ${cond}, $zero, {label}")
+
+            elif linha.endswith(":"):
+                self.saida.append(f"{linha}")
+
+            elif linha.startswith("GOTO"):
+                _, label = linha.split()
+                self.saida.append(f"j {label}")
+
+        return self.saida
+
 
 # Execução principal
 if __name__ == "__main__":
@@ -141,13 +187,17 @@ if __name__ == "__main__":
     # Geração de código intermediário
     gerador = GeradorCodigo(tokens)
     codigo = gerador.gerar()
-
     with open("codigo_intermediario.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(codigo))
 
     # Otimização
     otimizador = OtimizadorCodigo(codigo)
     otimizados = otimizador.otimizar()
-
     with open("codigo_otimizado.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(otimizados))
+
+    # Geração de código MIPS
+    gerador_mips = GeradorMIPS(otimizados)
+    mips = gerador_mips.traduzir()
+    with open("codigo_mips.asm", "w", encoding="utf-8") as f:
+        f.write("\n".join(mips))
